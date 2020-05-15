@@ -64,6 +64,15 @@ export default [
         component: () => import('@/view/home.vue')
       },
       {
+        path: '/news',
+        name: '新闻',
+        meta: {
+          icon: 'logo-markdown',
+          title: '新闻'
+        },
+        component: () => import('@/view/news.vue')
+      },
+      {
         path: 'house',
         name: '房源大全',
         meta: {
