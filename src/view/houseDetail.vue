@@ -64,9 +64,33 @@
             class="map"
             @ready="handler"
             >
+            <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
             <bm-marker :position="{lng:center.lng, lat: center.lat}" :dragging="true">
               <bm-info-window :show=true>{{detail.ename}}</bm-info-window>
             </bm-marker>
+            </baidu-map>
+          </card>
+        </ListItem>
+        <ListItem>
+          <ListItemMeta title="路线规划" />
+          <card>
+            <p slot="title">地图</p>
+            <p>您的位置：{{this.district.province}} {{this.district.city}}</p>
+            <baidu-map
+            :center="center"
+            :zoom="zoom"
+            :dragging="true"
+            class="map"
+            @ready="handler"
+            >
+            <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
+            <bm-marker :position="{lng:center.lng, lat: center.lat}" :dragging="true" animation="BMAP_ANIMATION_BOUNCE">
+              <bm-info-window :show=true>{{detail.ename}}</bm-info-window>
+            </bm-marker>
+            <bm-marker :position="{lng:yourLocation.lng, lat: yourLocation.lat}" :dragging="true">
+              <!-- <bm-info-window :show=true>你的位置</bm-info-window> -->
+            </bm-marker>
+            <bm-transit :start="yourLocation" :end="center" :auto-viewport="true" :panel=false location="上海"></bm-transit>
             </baidu-map>
           </card>
         </ListItem>
@@ -125,10 +149,15 @@ export default {
         qcontent: ''
       },
       baidumapSwitch: false,
+      yourLocation: {
+        lng: '',
+        lat: ''
+      },
       center: {
         lng: '',
         lat: ''
       },
+      district: {},
       zoom: 16
     }
   },
@@ -136,6 +165,7 @@ export default {
     this.GetId()
     this.GetHouseById()
     this.GetQuestionsById(1)
+    this.GetYourLocation()
   },
   computed: {
     // ...mapState({
@@ -143,6 +173,20 @@ export default {
     // })
   },
   methods: {
+    GetYourLocation () {
+      var that = this
+      that
+        .$axios({
+          method: 'get',
+          url: 'user/getLocation'
+        })
+        .then(response => {
+          console.log(response)
+          this.district = response.data.content.address_detail
+          this.yourLocation.lng = response.data.content.point.x
+          this.yourLocation.lat = response.data.content.point.y
+        })
+    },
     GetId () {
       this.question.uid = this.$store.state.user.userId
     },
